@@ -8,3 +8,4 @@ BOTH_SHIFTS_TURNS_ON_CAPS_WORD 	= yes
 COMBO_ENABLE 					= yes
 SEND_STRING_ENABLE = yes
 EXTRAFLAGS += -flto
+VPATH += keyboards/gboards

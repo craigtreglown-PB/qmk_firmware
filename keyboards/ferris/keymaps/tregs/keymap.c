@@ -1,10 +1,9 @@
 // this is the style you want to emulate.
 // This is the canonical layout file for the Quantum project. If you want to add another keyboard,
 
-#include QMK_KEYBOARD_H
-
 #include <stdint.h>
 #include QMK_KEYBOARD_H
+#include g/keymap_combo.h
 
 #define KC_COPY_UPDATED LCTL(KC_C)
 #define KC_CUT_UPDATED LCTL(KC_X)
@@ -13,15 +12,7 @@
 #define KC_REDO_UPDATED LCTL(KC_Y)
 #define KC_FOCUS_BROWSER_BAR LCTL(KC_L)
 
-// combos
-const uint16_t PROGMEM esc_combo[]    = {LT(2, KC_TAB), LT(4, KC_SPC), COMBO_END};
-const uint16_t PROGMEM delete_combo[] = {LT(3, KC_ENT), LT(1, KC_BSPC), COMBO_END};
 
-
-combo_t key_combos[] = {
-    COMBO(esc_combo, LT(6, KC_ESC)),
-    COMBO(delete_combo, LT(5, KC_DEL)) // keycodes with modifiers are possible too!
-};
 
 
 /*
@@ -155,6 +146,26 @@ tap_dance_action_t tap_dance_actions[] = {
  [TD_APOSTROPHE] = ACTION_TAP_DANCE_DOUBLE (KC_I, KC_QUOT),
  [J_ESC_TD] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, J_ESC_TD_finished, J_ESC_TD_reset)
 };
+
+
+
+
+// combos
+const uint16_t PROGMEM esc_combo[]    = {LT(2, KC_TAB), LT(4, KC_SPC), COMBO_END};
+const uint16_t PROGMEM delete_combo[] = {LT(3, KC_ENT), LT(1, KC_BSPC), COMBO_END};
+const uint16_t PROGMEM esc_combo_jk[] = {MT(MOD_RSFT, KC_J), MT(MOD_RCTL, KC_K), COMBO_END};
+const uint16_t PROGMEM right_hyper_combo[] = {TD(J_ESC_TD),    MT(MOD_RCTL, KC_K),    MT(MOD_RALT, KC_L), MT(MOD_RGUI, KC_SCLN), COMBO_END};
+
+
+combo_t key_combos[] = {
+    COMBO(esc_combo, LT(6, KC_ESC)),
+    COMBO(delete_combo, LT(5, KC_DEL)),
+    COMBO(esc_combo_jk, KC_ESC),
+    COMBO(right_hyper_combo, KC_HYPR)
+};     
+
+
+
 
 
 
