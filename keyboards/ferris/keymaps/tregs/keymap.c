@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include QMK_KEYBOARD_H
-#include g/keymap_combo.h
+#include "g/keymap_combo.h"
 
 #define KC_COPY_UPDATED LCTL(KC_C)
 #define KC_CUT_UPDATED LCTL(KC_X)
@@ -12,171 +12,32 @@
 #define KC_REDO_UPDATED LCTL(KC_Y)
 #define KC_FOCUS_BROWSER_BAR LCTL(KC_L)
 
-
-
-
-/*
-Advanced tapdance stuff
-*/
-
-// tapdance keycodes
-enum td_keycodes {
-  ALT_LP // Our example key: `LALT` when held, `(` when tapped. Add additional keycodes for each tapdance.
-};
-
-// define a type containing as many tapdance states as you need
-typedef enum {
-  SINGLE_TAP,
-  SINGLE_HOLD,
-  DOUBLE_SINGLE_TAP
-} td_state_t;
-
-// create a global instance of the tapdance state type
-static td_state_t td_state;
-
-// declare your tapdance functions:
-
-// `finished` and `reset` functions for each tapdance keycode
-void altlp_finished (tap_dance_state_t *state, void *user_data);
-void altlp_reset (tap_dance_state_t *state, void *user_data);
-
-/*
-End advanced tapdance stuff
-*/
-
-
-//Tap Dance Declarations
-enum {
- CT_CP,
- CT_PASTE,
- TD_APOSTROPHE,
- J_ESC_TD
-};
-
-
-//Tap Dance Definitions
-
-//copy on double tap c
-void dance_cp_finished (tap_dance_state_t *state, void *user_data) {
-  if (state->count == 1) {
-    register_code (KC_C);
-  } else {
-    register_code (KC_RCTL);
-    register_code (KC_C);
-  }
-}
-
-void dance_cp_reset (tap_dance_state_t *state, void *user_data) {
-  if (state->count == 1) {
-    unregister_code (KC_C);
-  } else {
-    unregister_code (KC_RCTL);
-    unregister_code (KC_C);
-  }
-}
-
-//paste on double tap v
-void dance_paste_finished (tap_dance_state_t *state, void *user_data) {
-  if (state->count == 1) {
-    register_code (KC_V);
-  } else {
-    register_code (KC_RCTL);
-    register_code (KC_V);
-  }
-}
-
-void dance_paste_reset (tap_dance_state_t *state, void *user_data) {
-  if (state->count == 1) {
-    unregister_code (KC_V);
-  } else {
-    unregister_code (KC_RCTL);
-    unregister_code (KC_V);
-  }
-}
-
-
-
-// determine the tapdance state to return
-int cur_dance_advanced (tap_dance_state_t *state) {
-  if (state->count == 1) {
-    if (state->interrupted || !state->pressed) { return SINGLE_TAP; }
-    else { return SINGLE_HOLD; }
-  }
-  if (state->count == 2) { return DOUBLE_SINGLE_TAP; }
-  else { return 3; } // any number higher than the maximum state value you return above
-}
- 
-// handle the possible states for each tapdance keycode you define:
-
-void J_ESC_TD_finished (tap_dance_state_t *state, void *user_data) {
-  td_state = cur_dance_advanced(state);
-  switch (td_state) {
-    case SINGLE_TAP:
-      register_code16(KC_J);
-      break;
-    case SINGLE_HOLD:
-      register_mods(MOD_BIT(KC_RSFT)); // for a layer-tap key, use `layer_on(_MY_LAYER)` here
-      break;
-    case DOUBLE_SINGLE_TAP: // allow nesting of 2 parens `((` within tapping term
-      tap_code16(KC_ESC);
-      register_code16(KC_ESC);
-  }
-}
-
-void J_ESC_TD_reset (tap_dance_state_t *state, void *user_data) {
-  switch (td_state) {
-    case SINGLE_TAP:
-      unregister_code16(KC_J);
-      break;
-    case SINGLE_HOLD:
-      unregister_mods(MOD_BIT(KC_RSFT)); // for a layer-tap key, use `layer_off(_MY_LAYER)` here
-      break;
-    case DOUBLE_SINGLE_TAP:
-      unregister_code16(KC_ESC);
-  }
-}
-
-
-
-
-//All tap dance functions would go here. Only showing this one.
-tap_dance_action_t tap_dance_actions[] = {
- [CT_CP] = ACTION_TAP_DANCE_FN_ADVANCED (NULL, dance_cp_finished, dance_cp_reset),
- [CT_PASTE] = ACTION_TAP_DANCE_FN_ADVANCED (NULL, dance_paste_finished, dance_paste_reset),
- [TD_APOSTROPHE] = ACTION_TAP_DANCE_DOUBLE (KC_I, KC_QUOT),
- [J_ESC_TD] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, J_ESC_TD_finished, J_ESC_TD_reset)
-};
-
-
-
-
-// combos
-const uint16_t PROGMEM esc_combo[]    = {LT(2, KC_TAB), LT(4, KC_SPC), COMBO_END};
-const uint16_t PROGMEM delete_combo[] = {LT(3, KC_ENT), LT(1, KC_BSPC), COMBO_END};
-const uint16_t PROGMEM esc_combo_jk[] = {MT(MOD_RSFT, KC_J), MT(MOD_RCTL, KC_K), COMBO_END};
-const uint16_t PROGMEM right_hyper_combo[] = {TD(J_ESC_TD),    MT(MOD_RCTL, KC_K),    MT(MOD_RALT, KC_L), MT(MOD_RGUI, KC_SCLN), COMBO_END};
-
-
-combo_t key_combos[] = {
-    COMBO(esc_combo, LT(6, KC_ESC)),
-    COMBO(delete_combo, LT(5, KC_DEL)),
-    COMBO(esc_combo_jk, KC_ESC),
-    COMBO(right_hyper_combo, KC_HYPR)
-};     
-
-
-
-
+#ifdef TAPPING_TERM_PER_KEY                                                                                                                                                              
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case KC_A:
+            return TAPPING_TERM + 100;
+        case KC_F:
+        case KC_J:
+        case KC_C:
+        case KC_V:
+        case KC_I:
+            return TAPPING_TERM - 100;
+        default:
+            return TAPPING_TERM;
+    }   
+}       
+#endif  
 
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_split_3x5_2(
   //,----------------------------------------.                    ,-----------------------------------------------------.
-     KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,    TD(TD_APOSTROPHE),    KC_O,   KC_P,
+     KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,
   //|----+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-     MT(MOD_LGUI, KC_A),    MT(MOD_LALT, KC_S),    MT(MOD_LCTL, KC_D),    MT(MOD_LSFT, KC_F),    KC_G,            KC_H,    TD(J_ESC_TD),    MT(MOD_RCTL, KC_K),    MT(MOD_RALT, KC_L), MT(MOD_RGUI, KC_SCLN),
+     MT(MOD_LGUI, KC_A),    MT(MOD_LALT, KC_S),    MT(MOD_LCTL, KC_D),    MT(MOD_LSFT, KC_F),    KC_G,            KC_H,    MT(MOD_RSFT, KC_J),    MT(MOD_RCTL, KC_K),    MT(MOD_RALT, KC_L), MT(MOD_RGUI, KC_SCLN),
   //|----+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-     KC_Z,    KC_X,    TD(CT_CP),    TD(CT_PASTE),    MT(KC_FOCUS_BROWSER_BAR, KC_B),                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH,
+     KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH,
   //|----+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                           LT(2, KC_TAB),  LT(4, KC_SPC),     LT(3, KC_ENT),   LT(1, KC_BSPC)
                                       //`--------------------------'  `--------------------------'
