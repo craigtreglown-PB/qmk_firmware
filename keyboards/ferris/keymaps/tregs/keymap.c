@@ -60,7 +60,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // navigation
     [2] = LAYOUT_split_3x5_2(
   //,---------------------------------------------.                    ,-----------------------------------------------------.
-      KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC,                      KC_REDO_UPDATED, KC_PASTE_UPDATED, KC_COPY_UPDATED, KC_CUT_UPDATED,   KC_UNDO_UPDATED,
+      KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,   XXXXXXX,
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LGUI, KC_LALT,    KC_LCTL,    KC_LSFT, XXXXXXX,                KC_LEFT,  KC_DOWN,  KC_UP,   KC_RIGHT, KC_RIGHT,
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
